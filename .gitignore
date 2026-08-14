@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenv
+backend/.venv/
+
+# Skyfield / cache
+backend/data/skyfield/
+backend/.cache/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local browser QA artifacts
+.playwright-mcp/
+.playwright-cli/
+outputs/
+
+# Secrets / local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# OS
+.DS_Store

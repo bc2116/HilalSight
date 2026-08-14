@@ -1,0 +1,1007 @@
+/* ---------- Shell & layout ---------- */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  grid-template-areas:
+    'map map'
+    'sidebar details';
+  gap: 14px;
+  padding: 14px 16px;
+  align-items: start;
+}
+
+.mapTop {
+  grid-area: map;
+  min-width: 0;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  min-width: 0;
+}
+
+.details {
+  grid-area: details;
+  min-width: 0;
+}
+
+.sidebar,
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 18px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--stroke);
+  color: var(--muted2);
+  font-size: 12px;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  padding: 16px 18px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--stroke);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandIcon {
+  width: 34px;
+  height: 34px;
+  color: var(--warn);
+  filter: drop-shadow(0 0 14px rgba(244, 208, 111, 0.35));
+  flex: none;
+}
+
+.brandName {
+  font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.brandTag {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.monthStrip {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.monthPill {
+  padding: 9px 12px;
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  border-radius: 14px;
+  min-width: 170px;
+}
+
+.monthK {
+  font-size: 11px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.monthV {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ---------- Panels & forms ---------- */
+
+.panel {
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.panelHeader {
+  margin-bottom: 12px;
+}
+
+.panelSummary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panelSummary::-webkit-details-marker {
+  display: none;
+}
+
+.panelSummary::after {
+  content: '▾';
+  color: var(--muted2);
+  transition: transform 120ms ease;
+}
+
+.settingsPanel:not([open]) .panelSummary::after {
+  transform: rotate(-90deg);
+}
+
+.panelSummary .panelTitle,
+.panelSummary .panelSub {
+  display: block;
+}
+
+.settingsBody {
+  margin-top: 14px;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+.panelSub {
+  margin-top: 4px;
+  color: var(--muted2);
+  font-size: 12px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--stroke2);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.input:focus {
+  border-color: rgba(200, 255, 225, 0.55);
+  box-shadow: 0 0 0 3px rgba(81, 224, 138, 0.12);
+}
+
+.inputInline {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+.inputYear {
+  width: auto;
+  flex: 0 0 96px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.grid2tight {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.subfield {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sublabel {
+  font-size: 11px;
+  color: var(--muted2);
+}
+
+.help {
+  color: var(--muted2);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.warn {
+  color: rgba(244, 208, 111, 0.95);
+}
+
+/* ---------- Buttons & segmented control ---------- */
+
+.btn {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-stroke);
+  background: var(--accent-soft);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: rgba(81, 224, 138, 0.22);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnGhost {
+  border-color: var(--stroke2);
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.btnGhost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.btnSmall {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.seg {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.segBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 14px;
+  border: 1px solid var(--stroke2);
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--text);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.segBtn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.segBtnOn {
+  border-color: rgba(81, 224, 138, 0.55);
+  background: rgba(81, 224, 138, 0.13);
+}
+
+.segDay {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.segDate {
+  font-size: 10.5px;
+  color: var(--muted2);
+  line-height: 1.2;
+}
+
+.segBtnOn .segDate {
+  color: rgba(170, 240, 200, 0.85);
+}
+
+.daySelector {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.daySeg {
+  flex-wrap: nowrap;
+}
+
+.daySeg .segBtn {
+  min-width: 94px;
+  padding-inline: 10px;
+}
+
+.segMoonset {
+  margin-top: 2px;
+  color: rgba(244, 208, 111, 0.95);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.segMoonsetLoading {
+  color: var(--muted2);
+}
+
+.segMoonsetError {
+  color: rgba(255, 180, 180, 0.95);
+}
+
+.daySelectorHint {
+  color: var(--muted2);
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+
+.pill {
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--stroke2);
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.pillBad {
+  border-color: rgba(239, 107, 107, 0.55);
+  background: rgba(239, 107, 107, 0.12);
+  color: rgba(255, 230, 230, 0.9);
+  white-space: normal;
+}
+
+/* ---------- Map header ---------- */
+
+.mapHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 4px;
+  flex-wrap: wrap;
+}
+
+.mapHeaderLeft {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  min-width: 260px;
+}
+
+.mapHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mapTitle {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+.mapSubtitle {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.muted2 {
+  color: var(--muted2);
+}
+
+.mapMeta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ---------- Map card ---------- */
+
+.mapCard {
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 18px;
+  overflow: hidden;
+  height: clamp(520px, 64vh, 720px);
+  position: relative;
+}
+
+.mapWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Both canvases are absolutely positioned so their inline pixel sizes never
+   inflate the grid track's min-content width (which would block shrinking). */
+.mapCanvas {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+}
+
+.mapOverlayCanvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mapVeil {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.6);
+  background: rgba(7, 11, 20, 0.35);
+}
+
+.mapErrorVeil {
+  flex-direction: column;
+  padding: 24px;
+  text-align: center;
+  background: rgba(7, 11, 20, 0.78);
+}
+
+.mapUpdating {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 22, 0.78);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+
+  .btn,
+  .segBtn,
+  .input {
+    transition: none;
+  }
+}
+
+/* Hover readout chip */
+
+.mapHover {
+  position: absolute;
+  width: 200px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(10, 14, 22, 0.85);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  font-size: 11.5px;
+  line-height: 1.35;
+  z-index: 3;
+}
+
+.mapHoverCoords {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mapHoverCat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+.mapHoverSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex: none;
+}
+
+.mapHoverCode {
+  font-weight: 800;
+}
+
+.mapHoverQ {
+  margin-top: 2px;
+  color: var(--muted2);
+  font-size: 11px;
+}
+
+/* ---------- Legend (map overlay) ---------- */
+
+.mapLegendOverlay {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: min(252px, 56%);
+  max-height: calc(100% - 24px);
+  z-index: 2;
+}
+
+.legend {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(10, 14, 22, 0.66);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  overflow: auto;
+  max-height: inherit;
+}
+
+.legendSummary {
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.88);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.legendSummary::-webkit-details-marker {
+  display: none;
+}
+
+.legendSummary::after {
+  content: '▾';
+  color: var(--muted2);
+  transition: transform 120ms ease;
+}
+
+.legend:not([open]) .legendSummary::after {
+  transform: rotate(-90deg);
+}
+
+.legendBody {
+  margin-top: 8px;
+}
+
+.legendGrid {
+  display: grid;
+  gap: 5px;
+}
+
+.legendRow {
+  display: grid;
+  grid-template-columns: 12px 24px 1fr;
+  gap: 7px;
+  align-items: center;
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.legendCode {
+  font-weight: 800;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.legendLabel {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.legendMarkers {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--stroke);
+}
+
+.legendMarkersTitle {
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.markerRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 6px;
+  line-height: 1.25;
+}
+
+.markerDot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+}
+
+.markerDotNaked {
+  border-color: rgba(65, 214, 101, 0.95);
+}
+
+.markerDotOptical {
+  border-color: rgba(255, 140, 0, 0.95);
+}
+
+/* ---------- Point details / report ---------- */
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.searchRow .input {
+  width: auto;
+  min-width: 0;
+}
+
+.searchStatus {
+  margin: -4px 0 10px;
+}
+
+.geocodeDisclosure {
+  margin: -4px 0 10px;
+}
+
+.exportRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.reportCard {
+  border-radius: 14px;
+  border: 1px solid var(--stroke);
+  background: rgba(0, 0, 0, 0.18);
+  padding: 12px;
+}
+
+.locationEmpty {
+  min-height: 132px;
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  padding: 24px;
+  border: 1px dashed var(--stroke2);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.locationEmptyTitle {
+  color: var(--text);
+  font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.reportTitle {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.reportMeta {
+  color: var(--muted);
+  font-size: 12px;
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.eveningDetails {
+  border-top: 1px solid var(--stroke);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.eveningSummary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  user-select: none;
+  list-style: none;
+}
+
+.eveningSummary::-webkit-details-marker {
+  display: none;
+}
+
+.eveningSummaryLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.catBadge {
+  min-width: 34px;
+  height: 24px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid var(--stroke2);
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 900;
+  font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  letter-spacing: 0.2px;
+}
+
+.eveningSummaryLabel {
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.eveningSummaryMethod {
+  color: var(--muted2);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.eveningSummaryMetrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.eveningMoonsetMetric {
+  color: rgba(244, 208, 111, 0.95);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.eveningBody {
+  margin-top: 10px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.kv .k {
+  font-size: 11px;
+  color: var(--muted2);
+}
+
+.kv .v {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 107, 107, 0.55);
+  background: rgba(239, 107, 107, 0.12);
+  font-size: 13px;
+}
+
+.disclaimer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.4;
+}
+
+.footnote {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted2);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'map'
+      'details'
+      'sidebar';
+  }
+}
+
+@media (max-width: 760px) {
+  .header {
+    padding: 14px 14px 10px;
+  }
+
+  .layout {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .monthStrip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .monthPill {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .mapCard {
+    height: clamp(300px, 78vw, 360px);
+  }
+
+  .mapHeaderLeft,
+  .daySelector {
+    width: 100%;
+  }
+
+  .daySeg .segBtn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 5px;
+  }
+
+  .segMoonset {
+    font-size: 9.5px;
+  }
+
+  .mapLegendOverlay {
+    width: min(210px, 62%);
+  }
+
+  .searchRow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .searchRow .input {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .searchRow .btn {
+    width: 100%;
+  }
+
+  .grid2tight {
+    grid-template-columns: 1fr;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .eveningSummaryMetrics {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}

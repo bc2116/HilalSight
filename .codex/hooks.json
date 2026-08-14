@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "notes": [
+    "Repo-local hook references are intentionally empty by default.",
+    "Use reviewed hooks from ../Agentic-Enablement/.codex/hooks via user-level bootstrap if desired.",
+    "Do not add absolute machine-specific hook paths to committed files."
+  ],
+  "hooks": {}
+}

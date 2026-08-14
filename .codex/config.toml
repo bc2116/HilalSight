@@ -1,0 +1,15 @@
+# BEGIN Agentic Enablement Repo Adapter
+[agentic_enablement]
+enabled = true
+shared_operating_layer = "../Agentic-Enablement"
+registry = "../Agentic-Enablement/registry/repos.yaml"
+adapter_docs = "docs/agent"
+local_skill = "hilalsight-local-dev"
+recommended_agents = ["repo_cartographer", "generic_repo_adapter", "pr_reviewer", "compliance_guard"]
+recommended_skills = ["generic-repo-intake", "repo-codex-adapter-writer", "docs-tech-writer"]
+
+[agentic_enablement.defaults]
+no_production_code_without_explicit_request = true
+no_secrets = true
+prefer_small_verifiable_changes = true
+# END Agentic Enablement Repo Adapter

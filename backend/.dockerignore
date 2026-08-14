@@ -1,0 +1,12 @@
+__pycache__/
+.venv/
+.cache/
+data/skyfield/
+tests/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.log

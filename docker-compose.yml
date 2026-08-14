@@ -1,0 +1,19 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - hilalsight_skyfield:/app/data/skyfield
+      - hilalsight_cache:/app/.cache
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  hilalsight_skyfield:
+  hilalsight_cache:
