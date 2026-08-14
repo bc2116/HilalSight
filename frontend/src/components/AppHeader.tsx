@@ -1,4 +1,4 @@
-import type { HijriTodayResponse } from '../types'
+import type { HijriContextResponse, HijriMonth } from '../types'
 
 function CrescentIcon() {
   return (
@@ -14,8 +14,19 @@ function CrescentIcon() {
   )
 }
 
-export function AppHeader(props: { hijri: HijriTodayResponse | null }) {
-  const { hijri } = props
+function monthLabel(month: HijriMonth): string {
+  return `${month.monthName} ${month.year} AH`
+}
+
+export function AppHeader(props: {
+  context: HijriContextResponse | null
+  loading: boolean
+  error: string | null
+}) {
+  const { context, loading, error } = props
+  const transition = context?.mode === 'transition' ? context.transition : null
+  const stableMonth = context?.mode === 'stable' ? context.month : null
+
   return (
     <header className="header">
       <div className="brand">
@@ -26,26 +37,52 @@ export function AppHeader(props: { hijri: HijriTodayResponse | null }) {
         </div>
       </div>
 
-      <div className="monthStrip">
-        {hijri ? (
-          <>
-            <div className="monthPill">
-              <div className="monthK">Today (Hijri)</div>
-              <div className="monthV">
-                {hijri.hijri.monthName} {hijri.hijri.year} AH
-              </div>
+      <div className="monthStrip" aria-live="polite" aria-busy={loading || undefined}>
+        {transition ? (
+          <div className="monthPill monthPillTransition">
+            <div className="monthK">Hijri month transition</div>
+            <div className="monthTransitionV">
+              <span>
+                <span className="monthRole">Leaving</span> {monthLabel(transition.leavingMonth)}
+              </span>
+              <span className="monthArrow" aria-hidden="true">
+                →
+              </span>
+              <span>
+                <span className="monthRole">Coming</span> {monthLabel(transition.enteringMonth)}
+              </span>
             </div>
-            <div className="monthPill">
-              <div className="monthK">Next month</div>
-              <div className="monthV">
-                {hijri.nextHijriMonth.monthName} {hijri.nextHijriMonth.year} AH
-              </div>
+            <div className="monthNote">
+              {error
+                ? 'Reference transition refresh unavailable.'
+                : loading
+                  ? 'Refreshing reference transition…'
+                  : 'Reference transition · local day varies'}
             </div>
-          </>
+          </div>
+        ) : stableMonth ? (
+          <div className="monthPill">
+            <div className="monthK">Hijri month</div>
+            <div className="monthV">{monthLabel(stableMonth)}</div>
+            <div className="monthNote">
+              {error
+                ? 'Reference month refresh unavailable.'
+                : loading
+                  ? 'Refreshing reference month…'
+                  : 'Reference month · local day varies'}
+            </div>
+          </div>
+        ) : error ? (
+          <div className="monthPill" title={error}>
+            <div className="monthK">Hijri month</div>
+            <div className="monthV muted">Unavailable</div>
+            <div className="monthNote">Reference calendar could not be loaded.</div>
+          </div>
         ) : (
           <div className="monthPill">
-            <div className="monthK">Hijri calendar</div>
+            <div className="monthK">Hijri month</div>
             <div className="monthV muted">Loading…</div>
+            <div className="monthNote">Loading the local-date reference…</div>
           </div>
         )}
       </div>

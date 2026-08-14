@@ -264,10 +264,10 @@ export function PointDetails(props: {
       {selected ? (
         <>
           <div className="reportCard" ref={cardRef}>
-            <div className="reportTitle">Sighting Report Card</div>
+            <div className="reportTitle">Visibility Report Card</div>
             <div className="reportMeta">
               <div>
-                Conjunction date label: <span className="mono">{date}</span>
+                Crescent-window base date: <span className="mono">{date}</span>
               </div>
               <div>
                 Coordinates: <span className="mono">{selected.lat.toFixed(4)}</span>,{' '}
@@ -395,13 +395,13 @@ export function PointDetails(props: {
       ) : (
         <div className="locationEmpty" role="status">
           <div className="locationEmptyTitle">Choose a location</div>
-          <div>Use the controls above or click anywhere on the map to generate a sighting report for the selected evenings.</div>
+          <div>Use the controls above or click anywhere on the map to generate a visibility report for the selected evenings.</div>
         </div>
       )}
 
       <div className="disclaimer">
-        Astronomical visibility prediction only. Actual sighting depends on weather, transparency, observer experience,
-        optics, and local religious authority.
+        Visibility model only. Actual observation depends on weather, transparency, observer experience, optics, and
+        local religious authority; this report does not confirm a sighting.
       </div>
     </div>
   )

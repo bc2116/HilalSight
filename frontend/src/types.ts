@@ -6,6 +6,32 @@ export type HijriTodayResponse = {
   note: string
 }
 
+export type HijriMonth = {
+  year: number
+  month: number
+  monthName: string
+}
+
+export type HijriContextResponse = {
+  referenceDate: string
+  mode: 'stable' | 'transition'
+  month: HijriMonth | null
+  transition: {
+    phase: 'before' | 'after'
+    leavingMonth: HijriMonth
+    enteringMonth: HijriMonth
+    referenceBoundaryDate: string
+  } | null
+  calendar: string
+  note: string
+  defaultProjection: {
+    targetMonth: HijriMonth
+    dateLabel: string
+    conjunctionUtc: string
+    relation: 'upcoming' | 'recent'
+  } | null
+}
+
 export type NewMoonNextResponse = {
   from: string
   newMoonUtc: string

@@ -2,6 +2,7 @@ import type {
   CacheWarmJob,
   CacheWarmStatus,
   GeocodeSearchResponse,
+  HijriContextResponse,
   HijriTodayResponse,
   MapResult,
   NewMoonNextResponse,
@@ -52,6 +53,10 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 export function getHijriToday(init?: RequestInit): Promise<HijriTodayResponse> {
   return fetchJson('/api/hijri/today', init)
+}
+
+export function getHijriContext(referenceDate: string, init?: RequestInit): Promise<HijriContextResponse> {
+  return fetchJson(`/api/hijri/context?date=${encodeURIComponent(referenceDate)}`, init)
 }
 
 export function hijriToGregorian(

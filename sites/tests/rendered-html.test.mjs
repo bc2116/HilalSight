@@ -59,6 +59,116 @@ test("serves the calendar and new-moon API contract", async () => {
   assert.equal(moonBody.newMoonDateUtc, "2026-07-14");
 });
 
+test("serves six-day Hijri transition context without using visibility results", async () => {
+  const stableBefore = await request("/api/hijri/context?date=2026-08-11");
+  assert.equal(stableBefore.status, 200);
+  const stableBeforeBody = await stableBefore.json();
+  const { conjunctionUtc, ...stableBeforeWithoutInstant } = stableBeforeBody.defaultProjection;
+  assert.deepEqual({ ...stableBeforeBody, defaultProjection: stableBeforeWithoutInstant }, {
+    referenceDate: "2026-08-11",
+    mode: "stable",
+    month: { year: 1448, month: 2, monthName: "Safar" },
+    transition: null,
+    calendar: "Islamic Civil (tabular reference)",
+    note: "Hijri days begin at local sunset, and month starts may differ by location, calendar, or authority. Visibility projections do not establish an official date.",
+    defaultProjection: {
+      targetMonth: { year: 1448, month: 3, monthName: "Rabi al-Awwal" },
+      dateLabel: "2026-08-12",
+      relation: "upcoming",
+    },
+  });
+  assert.match(conjunctionUtc, /^2026-08-12T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/);
+
+  for (const [date, phase] of [
+    ["2026-08-12", "before"],
+    ["2026-08-13", "before"],
+    ["2026-08-14", "before"],
+    ["2026-08-15", "after"],
+    ["2026-08-16", "after"],
+    ["2026-08-17", "after"],
+  ]) {
+    const response = await request(`/api/hijri/context?date=${date}`);
+    assert.equal(response.status, 200, date);
+    const body = await response.json();
+    assert.equal(body.mode, "transition", date);
+    assert.equal(body.month, null, date);
+    assert.equal(body.transition.phase, phase, date);
+    assert.deepEqual(body.transition.leavingMonth, { year: 1448, month: 2, monthName: "Safar" }, date);
+    assert.deepEqual(body.transition.enteringMonth, { year: 1448, month: 3, monthName: "Rabi al-Awwal" }, date);
+    assert.equal(body.transition.referenceBoundaryDate, "2026-08-15", date);
+    assert.equal(body.defaultProjection.dateLabel, "2026-08-12", date);
+    assert.equal(body.defaultProjection.relation, date === "2026-08-12" ? "upcoming" : "recent", date);
+  }
+
+  const stableAfter = await request("/api/hijri/context?date=2026-08-18");
+  assert.equal(stableAfter.status, 200);
+  const stableAfterBody = await stableAfter.json();
+  assert.deepEqual(stableAfterBody.month, { year: 1448, month: 3, monthName: "Rabi al-Awwal" });
+  assert.equal(stableAfterBody.transition, null);
+  assert.deepEqual(stableAfterBody.defaultProjection.targetMonth, { year: 1448, month: 4, monthName: "Rabi al-Thani" });
+  assert.equal(stableAfterBody.defaultProjection.dateLabel, "2026-09-11");
+  assert.equal(stableAfterBody.defaultProjection.relation, "upcoming");
+});
+
+test("handles Hijri context validation, supported endpoints, and year rollover", async () => {
+  for (const path of [
+    "/api/hijri/context",
+    "/api/hijri/context?date=2026-02-30",
+    "/api/hijri/context?date=1899-12-31",
+    "/api/hijri/context?date=2051-01-01",
+  ]) {
+    const response = await request(path);
+    assert.equal(response.status, 400, path);
+    assert.equal(response.headers.get("cache-control"), "no-store", path);
+  }
+
+  const rollover = await request("/api/hijri/context?date=2026-06-16");
+  assert.equal(rollover.status, 200);
+  const rolloverBody = await rollover.json();
+  assert.equal(rolloverBody.mode, "transition");
+  assert.deepEqual(rolloverBody.transition.leavingMonth, { year: 1447, month: 12, monthName: "Dhu al-Hijjah" });
+  assert.deepEqual(rolloverBody.transition.enteringMonth, { year: 1448, month: 1, monthName: "Muharram" });
+
+  const day27Calendar = await request("/api/hijri/from-gregorian?date=2026-07-13");
+  assert.equal((await day27Calendar.json()).hijri.day, 27);
+  const day27 = await request("/api/hijri/context?date=2026-07-13");
+  assert.equal(day27.status, 200);
+  const day27Body = await day27.json();
+  assert.equal(day27Body.mode, "stable");
+  assert.deepEqual(day27Body.month, { year: 1448, month: 1, monthName: "Muharram" });
+
+  const day28Calendar = await request("/api/hijri/from-gregorian?date=2026-07-14");
+  assert.equal((await day28Calendar.json()).hijri.day, 28);
+  const day28 = await request("/api/hijri/context?date=2026-07-14");
+  assert.equal(day28.status, 200);
+  const day28Body = await day28.json();
+  assert.equal(day28Body.mode, "transition");
+  assert.equal(day28Body.transition.phase, "before");
+  assert.deepEqual(day28Body.transition.leavingMonth, { year: 1448, month: 1, monthName: "Muharram" });
+});
+
+test("keeps upper-bound month context when no supported map projection remains", async () => {
+  const lastProjection = await request("/api/hijri/context?date=2050-12-18");
+  assert.equal(lastProjection.status, 200);
+  const lastProjectionBody = await lastProjection.json();
+  assert.equal(lastProjectionBody.defaultProjection.dateLabel, "2050-12-14");
+  assert.ok(lastProjectionBody.defaultProjection.dateLabel >= "1900-01-01");
+  assert.ok(lastProjectionBody.defaultProjection.dateLabel <= "2050-12-31");
+
+  const firstWithoutProjection = await request("/api/hijri/context?date=2050-12-19");
+  assert.equal(firstWithoutProjection.status, 200);
+  const firstWithoutProjectionBody = await firstWithoutProjection.json();
+  assert.equal(firstWithoutProjectionBody.mode, "stable");
+  assert.deepEqual(firstWithoutProjectionBody.month, { year: 1473, month: 4, monthName: "Rabi al-Thani" });
+  assert.equal(firstWithoutProjectionBody.defaultProjection, null);
+
+  const finalSupportedDate = await request("/api/hijri/context?date=2050-12-31");
+  assert.equal(finalSupportedDate.status, 200);
+  const finalSupportedDateBody = await finalSupportedDate.json();
+  assert.deepEqual(finalSupportedDateBody.month, { year: 1473, month: 4, monthName: "Rabi al-Thani" });
+  assert.equal(finalSupportedDateBody.defaultProjection, null);
+});
+
 test("matches the reference point and returns a complete map grid", async () => {
   const point = await request("/api/visibility/point?lat=21.4225&lon=39.8262&date=2026-07-14&dayOffset=0");
   assert.equal(point.status, 200);

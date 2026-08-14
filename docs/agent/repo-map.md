@@ -12,7 +12,7 @@ shared React UI (frontend/src)
 └── Sites/vinext    -> Worker API -> Astronomy Engine
 ```
 
-Both routes expose compatible calendar, new-moon, point-visibility, map, and status endpoints. The loopback local runtime also offers server-proxied geocoding; hosted place-name geocoding is disabled because isolate-local throttling cannot enforce an application-wide upstream quota. Accepted base date labels are `1900-01-01` through `2050-12-31`; offset events can cross an endpoint and next-conjunction results may be up to one lunation later.
+Both routes expose compatible calendar, month-context, new-moon, point-visibility, map, and status endpoints. The loopback local runtime also offers server-proxied geocoding; hosted place-name geocoding is disabled because isolate-local throttling cannot enforce an application-wide upstream quota. Accepted base date labels are `1900-01-01` through `2050-12-31`; offset events can cross an endpoint and next-conjunction results may be up to one lunation later. Month context uses a nullable default projection rather than sending an out-of-range map request at the upper edge.
 
 ## Stack
 
@@ -44,7 +44,8 @@ Both routes expose compatible calendar, new-moon, point-visibility, map, and sta
 - The Python and TypeScript astronomy implementations should agree semantically, but different ephemerides can produce small q/time differences near category boundaries.
 - The local runtime offers 0.5°, 1°, 2°, and 5° grids plus cache warming. The hosted runtime is restricted to 2° and 5° grids and computes on demand.
 - Local browser place searches use same-origin `/api/geocode/search`; only FastAPI contacts Nominatim. Hosted users enter coordinates instead.
-- The UI's Hijri calendar conversion is Islamic Civil/tabular and is not an official month-start ruling.
+- The UI sends the browser's local civil date to the shared Hijri context endpoint. Its Islamic Civil/tabular reference shows both months during the last three and first three reference days around a boundary, but makes no official month-start ruling and never derives month labels from visibility results.
+- `/api/hijri/today` is retained only as a UTC tabular compatibility endpoint; the UI must use `/api/hijri/context` for month reporting and default-window selection.
 
 ## Public-Release Risks And Gates
 

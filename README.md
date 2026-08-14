@@ -7,7 +7,7 @@ HilalSight estimates where the new crescent moon (*hilal*) may be visible using 
 - No sunset or no moonset during the requested civil day
 
 > [!IMPORTANT]
-> HilalSight is an astronomical planning and educational tool. It does not make an official religious determination. Actual sighting depends on weather, atmospheric transparency, observer experience, optics, and the rules of the relevant local authority.
+> HilalSight is an astronomical planning and educational tool. It does not make an official religious determination. It uses a reference calendar for month labels and transition timing. Hijri days begin at local sunset, and month starts may differ by the calendar or authority followed. Visibility maps do not confirm sightings or establish an official date.
 
 ## Architecture
 
@@ -23,9 +23,9 @@ The repository deliberately contains two calculation runtimes behind the same `/
 | Place-name search | Server-proxied Nominatim with strict local throttling | Disabled; use map clicks or coordinates |
 | Intended use | Local scientific reference and higher-detail work | Public, lower-cost interactive access |
 
-Both runtimes implement the same Yallop equations, civil-date semantics, validation limits, and response shapes. They use different ephemeris engines, so floating-point values are not expected to be bit-for-bit identical. Near a q-category threshold, compare the q value and underlying event times rather than treating a one-letter difference as scientifically meaningful. As an operational caution, values within about `0.001` of a threshold should be treated as boundary-sensitive; that tolerance is a HilalSight review convention, not part of the Yallop method.
+Both runtimes implement the same Yallop equations, civil-date semantics, six-day Hijri month-transition context, validation limits, and response shapes. They use different ephemeris engines, so floating-point values are not expected to be bit-for-bit identical. Near a q-category threshold, compare the q value and underlying event times rather than treating a one-letter difference as scientifically meaningful. As an operational caution, values within about `0.001` of a threshold should be treated as boundary-sensitive; that tolerance is a HilalSight review convention, not part of the Yallop method.
 
-Accepted base date labels are **1900-01-01 through 2050-12-31**, inclusive. Requested day offsets and event times near an endpoint can fall outside those label bounds, and the “next conjunction” can be up to one lunation later; these are reported as event data rather than accepted as new base-date requests.
+Accepted base date labels are **1900-01-01 through 2050-12-31**, inclusive. Requested day offsets and event times near an endpoint can fall outside those label bounds, and the “next conjunction” can be up to one lunation later; these are reported as event data rather than accepted as new base-date requests. If the month-context rule points to a conjunction outside the accepted map range, the API still returns the month context but leaves `defaultProjection` null instead of issuing an unusable map request.
 
 ## Quick Start With Docker
 
@@ -106,16 +106,19 @@ npm test
 npm audit --audit-level=high
 ```
 
-Current automated coverage includes q-polynomial and category boundaries, best-time arithmetic, global-map sanity, map/point agreement for a high-latitude grazing moonset, supported-date and input validation, polar-day behavior, trusted-origin protection for local cache warming, ephemeris metadata/checksum handling, hosted server rendering, API contract checks, offset-aware local times, and complete hosted map-grid output. The backend also has dependency and static-security gates. Frontend correctness is currently checked by TypeScript build and ESLint rather than a dedicated unit-test suite.
+Current automated coverage includes q-polynomial and category boundaries, best-time arithmetic, global-map sanity, map/point agreement for a high-latitude grazing moonset, six-day month-transition boundaries and upper-range fallback, supported-date and input validation, polar-day behavior, trusted-origin protection for local cache warming, ephemeris metadata/checksum handling, hosted server rendering, API contract checks, offset-aware local times, and complete hosted map-grid output. The backend also has dependency and static-security gates. Frontend correctness is currently checked by TypeScript build, ESLint, and browser smoke testing rather than a dedicated unit-test suite.
 
 ## What The App Does By Default
 
 When opened, HilalSight:
 
-1. Shows today's Hijri month/year and the next month using deterministic **Islamic Civil (tabular)** conversion. Official starts may differ.
-2. Finds the next astronomical new moon (conjunction).
-3. Offers three evenings—Day 0, Day 1, and Day 2—starting with the UTC date label of conjunction, and computes the selected map on demand.
-4. Evaluates each day offset at local sunset on that civil date.
+1. Uses the browser's local civil date and a deterministic **Islamic Civil (tabular) reference** to provide month context without claiming a location-specific Hijri day.
+2. During the reference month's last three days and the next month's first three days, shows both the leaving and entering months. Outside that transition window, it shows the reference month alone.
+3. During the transition window, loads the conjunction associated with that boundary, whether it is upcoming or recent. During the stable part of a month, it loads the coming month's conjunction. Visibility predictions never decide the displayed month label. At the upper supported-date edge, month context remains available even when that default map must be omitted.
+4. Offers three evenings—Day 0, Day 1, and Day 2—starting with the UTC date label of conjunction, and computes the selected map on demand.
+5. Evaluates each day offset at local sunset on that civil date.
+
+This transition display is intentionally neutral. It does not assert that a crescent was observed or that every community began a month on the same evening.
 
 ## Visibility Model
 
@@ -162,6 +165,7 @@ Model reference: B. D. Yallop, “A Method for Predicting the First Sighting of 
 The local and hosted runtimes share these read endpoints:
 
 - `GET /api/status`
+- `GET /api/hijri/context?date=YYYY-MM-DD`
 - `GET /api/hijri/today`
 - `GET /api/hijri/from-gregorian?date=YYYY-MM-DD`
 - `GET /api/hijri/to-gregorian?year=1448&month=2&day=1`
@@ -169,6 +173,8 @@ The local and hosted runtimes share these read endpoints:
 - `GET /api/visibility/map?date=YYYY-MM-DD&dayOffset=0&resolution=2`
 - `GET /api/visibility/point?lat=21.4225&lon=39.8262&date=YYYY-MM-DD&dayOffset=0`
 - `GET /api/cache/warm/status`
+
+The shared UI uses `/api/hijri/context`. `/api/hijri/today` remains a UTC tabular-conversion compatibility endpoint and must not be used as a universal or observed current-date claim.
 
 The local runtime also supports:
 

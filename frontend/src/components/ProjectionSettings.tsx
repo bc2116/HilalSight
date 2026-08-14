@@ -44,6 +44,7 @@ export function ProjectionSettings(props: {
   onApplyHijri: () => void
   applyingHijri: boolean
   hijriError: string | null
+  defaultWindowLabel: string
 
   dateLabel: string
   onDateLabel: (v: string) => void
@@ -82,7 +83,7 @@ export function ProjectionSettings(props: {
       <summary className="panelSummary">
         <span>
           <span className="panelTitle">Projection Settings</span>
-          <span className="panelSub">Defaults to the next astronomical conjunction from today.</span>
+          <span className="panelSub">{props.defaultWindowLabel}</span>
         </span>
       </summary>
 
@@ -124,9 +125,9 @@ export function ProjectionSettings(props: {
               className="btn btnSmall"
               onClick={props.onApplyHijri}
               disabled={props.applyingHijri || !props.pickYear || !props.pickMonth}
-              title="Project the conjunction for the selected Hijri month"
+              title="Show the crescent window for the selected Hijri month"
             >
-              {props.applyingHijri ? 'Projecting…' : 'Project'}
+              {props.applyingHijri ? 'Loading…' : 'Show window'}
             </button>
           </div>
           {props.hijriError ? (
@@ -137,7 +138,7 @@ export function ProjectionSettings(props: {
         </div>
 
         <label className="field">
-          <span className="label">Conjunction date label (civil date)</span>
+          <span className="label">Crescent-window base date (civil date)</span>
           <input
             className="input"
             type="date"

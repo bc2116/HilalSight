@@ -121,10 +121,11 @@ export function VisibilityMap(props: {
   selected: { lat: number; lon: number } | null
   loading?: boolean
   error?: string | null
+  emptyMessage?: string | null
   onRetry?: () => void
   onPickPoint: (lat: number, lon: number) => void
 }) {
-  const { map, markers, selected, loading = false, error = null, onRetry, onPickPoint } = props
+  const { map, markers, selected, loading = false, error = null, emptyMessage = null, onRetry, onPickPoint } = props
   const containerRef = useRef<HTMLDivElement | null>(null)
   const baseCanvasRef = useRef<HTMLCanvasElement | null>(null)
   const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -467,6 +468,10 @@ export function VisibilityMap(props: {
               Retry
             </button>
           ) : null}
+        </div>
+      ) : !map && emptyMessage ? (
+        <div className="mapVeil" role="status">
+          {emptyMessage}
         </div>
       ) : !map ? (
         <div className="mapVeil" role="status">

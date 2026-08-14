@@ -1,4 +1,4 @@
-import { addHijriMonth, gregorianToHijri, hijriToGregorian, monthName } from '@/lib/hijri'
+import { addHijriMonth, gregorianToHijri, hijriReferenceContext, hijriToGregorian, monthName } from '@/lib/hijri'
 import {
   computeVisibilityMap,
   computeVisibilityPoint,
@@ -10,6 +10,9 @@ import {
 } from '@/lib/visibility'
 
 const mapCache = new Map<string, ReturnType<typeof computeVisibilityMap>>()
+const DAY_MS = 86_400_000
+const HIJRI_CONTEXT_NOTE =
+  'Hijri days begin at local sunset, and month starts may differ by location, calendar, or authority. Visibility projections do not establish an official date.'
 
 function json(data: unknown, status = 200, cacheControl?: string): Response {
   const headers = cacheControl ? { 'Cache-Control': cacheControl } : undefined
@@ -65,6 +68,39 @@ export async function GET(request: Request): Promise<Response> {
       nextHijriMonth: { ...next, monthName: monthName(next.month) },
       calendar: 'Islamic Civil (tabular arithmetic)',
       note: 'Official month starts may differ by country/authority and actual sighting.',
+    })
+  }
+
+  if (path === 'hijri/context') {
+    const date = parseDateLabel(url.searchParams.get('date'))
+    if (!date) return detail('Invalid date=YYYY-MM-DD')
+
+    const context = hijriReferenceContext(date)
+    const searchStart = new Date(context.projectionBoundaryDate.getTime() - 15 * DAY_MS)
+    const conjunction = nextNewMoon(searchStart)
+    const separationDays = Math.abs(context.projectionBoundaryDate.getTime() - conjunction.getTime()) / DAY_MS
+    if (separationDays > 7) return detail('Unable to match the reference month boundary to a conjunction', 500)
+
+    const referenceDate = date.toISOString().slice(0, 10)
+    const conjunctionUtc = conjunction.toISOString()
+    const conjunctionDateLabel = conjunctionUtc.slice(0, 10)
+    const defaultProjection =
+      conjunctionDateLabel >= SUPPORTED_DATE_MIN && conjunctionDateLabel <= SUPPORTED_DATE_MAX
+        ? {
+            targetMonth: context.targetMonth,
+            dateLabel: conjunctionDateLabel,
+            conjunctionUtc,
+            relation: conjunctionDateLabel < referenceDate ? ('recent' as const) : ('upcoming' as const),
+          }
+        : null
+    return json({
+      referenceDate,
+      mode: context.mode,
+      month: context.month,
+      transition: context.transition,
+      calendar: 'Islamic Civil (tabular reference)',
+      note: HIJRI_CONTEXT_NOTE,
+      defaultProjection,
     })
   }
 

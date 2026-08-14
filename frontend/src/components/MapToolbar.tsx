@@ -9,6 +9,7 @@ import {
 
 export function MapToolbar(props: {
   civilDate: string
+  crescentWindowLabel: string
   evenings: number[]
   dayDates: string[]
   selectedDay: number
@@ -18,11 +19,13 @@ export function MapToolbar(props: {
   pointLoading: Record<number, boolean | undefined>
   pointErrors: Record<number, string | undefined>
   map: MapResult | null
+  mapStatusLabel: string
   exporting: boolean
   onExport: () => void
 }) {
   const {
     civilDate,
+    crescentWindowLabel,
     evenings,
     dayDates,
     selectedDay,
@@ -32,6 +35,7 @@ export function MapToolbar(props: {
     pointLoading,
     pointErrors,
     map,
+    mapStatusLabel,
     exporting,
     onExport,
   } = props
@@ -42,7 +46,8 @@ export function MapToolbar(props: {
         <div>
           <h2 className="mapTitle">Global Visibility Map</h2>
           <div className="mapSubtitle">
-            Evening of <span className="mono">{civilDate || '—'}</span>
+            {crescentWindowLabel ? <>{crescentWindowLabel} · </> : null}Evening of{' '}
+            <span className="mono">{civilDate || '—'}</span>
             {civilDate ? <span className="muted2"> · {fmtWeekdayDateUtc(civilDate)} (civil-date label)</span> : null}
           </div>
         </div>
@@ -118,7 +123,7 @@ export function MapToolbar(props: {
               <span className="pill">{map.resolution}° grid</span>
             </>
           ) : (
-            <span className="pill">Loading…</span>
+            <span className="pill">{mapStatusLabel}</span>
           )}
         </div>
         <button className="btn btnSmall" onClick={onExport} disabled={!map || exporting}>

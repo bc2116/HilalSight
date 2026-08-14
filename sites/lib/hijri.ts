@@ -17,6 +17,21 @@ export const HIJRI_MONTH_NAMES = [
 
 export type HijriDate = { year: number; month: number; day: number }
 
+export type HijriMonth = { year: number; month: number; monthName: string }
+
+export type HijriReferenceContext = {
+  mode: 'stable' | 'transition'
+  month: HijriMonth | null
+  transition: null | {
+    phase: 'before' | 'after'
+    leavingMonth: HijriMonth
+    enteringMonth: HijriMonth
+    referenceBoundaryDate: string
+  }
+  targetMonth: HijriMonth
+  projectionBoundaryDate: Date
+}
+
 function gregorianToJd(date: Date): number {
   const year = date.getUTCFullYear()
   const month = date.getUTCMonth() + 1
@@ -58,15 +73,74 @@ export function hijriToGregorian(hijri: HijriDate): Date {
   return jdToGregorian(islamicToJd(hijri))
 }
 
-export function addHijriMonth(hijri: HijriDate): HijriDate {
-  const monthIndex = hijri.month
+export function addHijriMonths(hijri: HijriDate, offset: number): HijriDate {
+  const monthIndex = (hijri.year - 1) * 12 + (hijri.month - 1) + offset
   return {
-    year: hijri.year + Math.floor(monthIndex / 12),
-    month: (monthIndex % 12) + 1,
+    year: Math.floor(monthIndex / 12) + 1,
+    month: ((monthIndex % 12) + 12) % 12 + 1,
     day: 1,
   }
 }
 
+export function addHijriMonth(hijri: HijriDate): HijriDate {
+  return addHijriMonths(hijri, 1)
+}
+
 export function monthName(month: number): string {
   return HIJRI_MONTH_NAMES[month - 1] ?? 'Unknown'
+}
+
+function describeMonth(hijri: HijriDate): HijriMonth {
+  return { year: hijri.year, month: hijri.month, monthName: monthName(hijri.month) }
+}
+
+function dateLabel(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
+export function hijriReferenceContext(date: Date): HijriReferenceContext {
+  const current = gregorianToHijri(date)
+  const currentMonthStart = hijriToGregorian({ ...current, day: 1 })
+  const nextMonth = addHijriMonths(current, 1)
+  const nextMonthStart = hijriToGregorian(nextMonth)
+  const monthLength = Math.round((nextMonthStart.getTime() - currentMonthStart.getTime()) / 86_400_000)
+
+  if (current.day >= monthLength - 2) {
+    return {
+      mode: 'transition',
+      month: null,
+      transition: {
+        phase: 'before',
+        leavingMonth: describeMonth(current),
+        enteringMonth: describeMonth(nextMonth),
+        referenceBoundaryDate: dateLabel(nextMonthStart),
+      },
+      targetMonth: describeMonth(nextMonth),
+      projectionBoundaryDate: nextMonthStart,
+    }
+  }
+
+  if (current.day <= 3) {
+    const previousMonth = addHijriMonths(current, -1)
+    return {
+      mode: 'transition',
+      month: null,
+      transition: {
+        phase: 'after',
+        leavingMonth: describeMonth(previousMonth),
+        enteringMonth: describeMonth(current),
+        referenceBoundaryDate: dateLabel(currentMonthStart),
+      },
+      targetMonth: describeMonth(current),
+      projectionBoundaryDate: currentMonthStart,
+    }
+  }
+
+  return {
+    mode: 'stable',
+    month: describeMonth(current),
+    transition: null,
+    targetMonth: describeMonth(nextMonth),
+    projectionBoundaryDate: nextMonthStart,
+  }
 }

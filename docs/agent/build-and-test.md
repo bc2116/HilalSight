@@ -62,7 +62,7 @@ npm run lint
 npm test
 ```
 
-The backend suite includes slower global-grid regression tests. `npm test` in `sites/` includes its build before exercising the rendered page and API contract. The standalone frontend has lint and TypeScript/build gates but no unit-test command.
+The backend suite includes slower global-grid regression tests. `npm test` in `sites/` includes its build before exercising the rendered page and API contract. Calendar contract tests cover the stable period and both sides of the six-day month-transition window. The standalone frontend has lint and TypeScript/build gates but no unit-test command.
 
 ## Dependency Audits
 
@@ -85,6 +85,7 @@ Full runtime and development dependency audits are release gates. Do not apply `
 - Run every command above after changing shared frontend code, calculations, API response shapes, dependencies, or deployment configuration.
 - For calculation changes, compare representative point and map results in both the Python and Sites runtimes, including a polar case and values near q-category thresholds.
 - Keep accepted base date labels at `1900-01-01` through `2050-12-31` consistent across the UI and both APIs; offset events can cross an endpoint and next-conjunction results may be up to one lunation later.
+- Keep `/api/hijri/context` aligned across runtimes: the browser supplies its local civil date, the last-three/first-three transition window uses the boundary's conjunction, the stable period uses the coming month's conjunction, and visibility results never select a month label. If that conjunction is outside the supported map-label range, return the month context with `defaultProjection: null`.
 - Preserve the local Docker bindings to `127.0.0.1`; the FastAPI service is not a hardened public multi-user API.
 - Verify that local place search remains server-proxied, bounded, attributed to OpenStreetMap/Nominatim, and free of sensitive test data. Hosted free-text geocoding must remain disabled unless centralized aggregate controls are added.
 - If a command is unavailable or fails for an environmental reason, report the exact gap rather than treating it as a pass.

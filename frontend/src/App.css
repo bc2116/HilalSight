@@ -127,6 +127,40 @@
   font-weight: 600;
 }
 
+.monthPillTransition {
+  min-width: min(430px, 100%);
+}
+
+.monthTransitionV {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.monthRole,
+.monthNote {
+  color: var(--muted2);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.monthRole {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.monthArrow {
+  color: var(--warn);
+}
+
+.monthNote {
+  margin-top: 3px;
+}
+
 /* ---------- Panels & forms ---------- */
 
 .panel {

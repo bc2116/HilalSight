@@ -16,6 +16,34 @@ import { computeFirstVisibilityMarker } from './utils/markers'
 function App({ hosted = false }: { hosted?: boolean }) {
   const hijriProjection = useHijriProjection()
   const { dateLabel, setDateLabel } = hijriProjection
+  const defaultProjection = hijriProjection.context?.defaultProjection ?? null
+  const defaultWindowLabel = defaultProjection
+    ? `Default: ${defaultProjection.relation} crescent window for ${defaultProjection.targetMonth.monthName} ${defaultProjection.targetMonth.year} AH.`
+    : hijriProjection.contextLoading
+      ? 'Loading the default crescent window for your local date.'
+      : 'Default crescent window is unavailable.'
+  const crescentWindowLabel = hijriProjection.projectionPending
+    ? 'Loading selected crescent window'
+    : hijriProjection.isAutoProjection
+      ? defaultProjection
+        ? `${defaultProjection.relation === 'recent' ? 'Recent' : 'Upcoming'} crescent window`
+        : hijriProjection.contextLoading
+          ? 'Crescent window loading'
+          : 'Crescent window unavailable'
+      : 'Selected crescent window'
+  const defaultWindowUnavailable =
+    !dateLabel && !hijriProjection.contextLoading && !!hijriProjection.context && !defaultProjection
+  const mapEmptyMessage = dateLabel
+    ? null
+    : hijriProjection.projectionPending
+      ? 'Loading the selected crescent window…'
+      : !hijriProjection.isAutoProjection
+        ? 'Choose a crescent-window base date to load the map.'
+        : defaultWindowUnavailable
+          ? 'No default crescent window is available within the supported map date range. Choose a Hijri month or base date to continue.'
+            : !hijriProjection.contextLoading && hijriProjection.contextError
+              ? 'The default crescent window could not be loaded.'
+              : null
 
   const [selectedDay, setSelectedDay] = useState(0)
   const [eveningsCount, setEveningsCount] = useState(3)
@@ -40,6 +68,17 @@ function App({ hosted = false }: { hosted?: boolean }) {
   const warm = useCacheWarm(!hosted)
 
   const currentMap = maps[effectiveSelectedDay] ?? null
+  const mapStatusLabel = currentMap
+    ? ''
+    : dateLabel
+      ? mapError
+        ? 'Unavailable'
+        : 'Loading…'
+      : hijriProjection.contextLoading || hijriProjection.projectionPending
+        ? 'Loading…'
+        : defaultWindowUnavailable || hijriProjection.contextError
+          ? 'Unavailable'
+          : 'Choose a date'
   const dayDates = useMemo(() => evenings.map((d) => addDaysUtc(dateLabel, d)), [dateLabel, evenings])
 
   const derivedMarkers = useMemo(() => {
@@ -75,16 +114,22 @@ function App({ hosted = false }: { hosted?: boolean }) {
     }
   }
 
-  const initError = !dateLabel && hijriProjection.error ? hijriProjection.error : null
+  const initError = !dateLabel ? hijriProjection.contextError : null
+  const contextRefreshError = dateLabel && hijriProjection.contextError ? hijriProjection.contextError : null
 
   return (
     <div className="app">
-      <AppHeader hijri={hijriProjection.hijri} />
+      <AppHeader
+        context={hijriProjection.context}
+        loading={hijriProjection.contextLoading}
+        error={hijriProjection.contextError}
+      />
 
       <div className="layout">
         <main className="main mapTop">
           <MapToolbar
             civilDate={dayDates[effectiveSelectedDay] ?? ''}
+            crescentWindowLabel={crescentWindowLabel}
             evenings={evenings}
             dayDates={dayDates}
             selectedDay={effectiveSelectedDay}
@@ -94,6 +139,7 @@ function App({ hosted = false }: { hosted?: boolean }) {
             pointLoading={point.loading}
             pointErrors={point.errors}
             map={currentMap}
+            mapStatusLabel={mapStatusLabel}
             exporting={exportingMap}
             onExport={() => exportMapPng().catch((e) => alert(messageOf(e)))}
           />
@@ -105,6 +151,7 @@ function App({ hosted = false }: { hosted?: boolean }) {
               selected={selectedPoint}
               loading={!!mapLoading[effectiveSelectedDay]}
               error={!currentMap && !mapLoading[effectiveSelectedDay] ? mapError : null}
+              emptyMessage={mapEmptyMessage}
               onRetry={retryMaps}
               onPickPoint={(lat, lon) => setSelectedPoint({ lat, lon })}
             />
@@ -120,6 +167,11 @@ function App({ hosted = false }: { hosted?: boolean }) {
           {initError ? (
             <div className="error" role="alert">
               Could not initialize HilalSight: {initError}
+            </div>
+          ) : null}
+          {contextRefreshError ? (
+            <div className="error" role="alert">
+              Could not refresh the Hijri reference month: {contextRefreshError}
             </div>
           ) : null}
           {mapError && currentMap ? (
@@ -143,7 +195,8 @@ function App({ hosted = false }: { hosted?: boolean }) {
             onPickYear={hijriProjection.setPickYear}
             onApplyHijri={() => applyHijriPick().catch(() => {})}
             applyingHijri={hijriProjection.applying}
-            hijriError={dateLabel ? hijriProjection.error : null}
+            hijriError={hijriProjection.error}
+            defaultWindowLabel={defaultWindowLabel}
             dateLabel={dateLabel}
             onDateLabel={setDateLabel}
             eveningsCount={eveningsCount}
@@ -185,8 +238,9 @@ function App({ hosted = false }: { hosted?: boolean }) {
 
       <footer className="footer">
         <div>
-          Deterministic Hijri conversion: <span className="mono">{hijriProjection.hijri?.calendar ?? '—'}</span>. This is
-          an astronomical projection; official month starts may differ.
+          HilalSight uses a reference calendar for month labels and transition timing. Hijri days begin at local sunset,
+          and month starts may differ by the calendar or authority followed. Visibility maps do not confirm sightings or
+          establish an official date.
         </div>
         <div>
           <a href="https://github.com/bc2116/HilalSight" target="_blank" rel="noreferrer">Source</a>

@@ -13,5 +13,6 @@
 - Local Docker services bind to `127.0.0.1` and are not presented as a public multi-user deployment.
 - Local place search is server-proxied to Nominatim with visible OpenStreetMap attribution and a user privacy notice. Hosted free-text geocoding is disabled until centralized aggregate throttling or a suitably provisioned service is available.
 - The local runtime verifies the downloaded JPL DE421 file by SHA-256 before calculation.
+- Hijri month reporting uses the browser's local civil date and a shared Islamic Civil/tabular reference. The final three and first three reference days display a neutral leaving-to-entering month transition; stable days show one month, and visibility calculations never determine the label. The default map stays on the boundary's conjunction throughout the transition and advances to the coming month's conjunction afterward; it is explicitly unavailable if that date falls outside the supported map range.
 
 Do not record temporary branch names, dirty-worktree snapshots, remote state, or machine-specific paths here; those are per-session facts, not maintained architecture decisions.

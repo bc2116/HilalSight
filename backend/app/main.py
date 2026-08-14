@@ -11,6 +11,7 @@ from .core.ephemeris import get_ephemeris_info
 from .core.geocoding import GeocodingError, search as geocode_search, validate_query
 from .core.hijri import HijriDate, gregorian_to_hijri_civil, hijri_civil_to_gregorian, hijri_today_utc
 from .core.map_grid import COMPUTE_LOCK_TIMEOUT_SECONDS, MapComputationBusy, MapResult, compute_map_cached
+from .core.month_context import MonthContextError, build_month_context
 from .core.newmoon import next_new_moon
 from .core.visibility import compute_visibility_point, point_visibility_to_dict
 
@@ -93,6 +94,21 @@ def hijri_from_gregorian(date_: str = Query(..., alias="date")) -> dict[str, Any
     d = _supported_date(date_, "date")
     h = gregorian_to_hijri_civil(d)
     return {"gregorianDate": d.isoformat(), "hijri": {"year": h.year, "month": h.month, "day": h.day, "monthName": h.month_name}}
+
+
+@app.get("/api/hijri/context")
+def hijri_context(date_: str | None = Query(None, alias="date")) -> dict[str, Any]:
+    if date_ is None:
+        raise HTTPException(status_code=400, detail="Invalid date=YYYY-MM-DD")
+    reference_date = _supported_date(date_, "date")
+    try:
+        return build_month_context(
+            reference_date,
+            projection_date_min=SUPPORTED_DATE_MIN,
+            projection_date_max=SUPPORTED_DATE_MAX,
+        )
+    except MonthContextError as exc:
+        raise HTTPException(status_code=500, detail="Unable to align the projection lunation") from exc
 
 
 @app.get("/api/hijri/to-gregorian")
