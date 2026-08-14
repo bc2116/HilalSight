@@ -6,6 +6,21 @@ import { sites } from "./build/sites-vite-plugin.ts";
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
 
+// Shared UI modules live outside the Sites project root. Always resolve their
+// bare imports from sites/node_modules so clean builds never depend on a
+// sibling frontend/node_modules installation.
+const SHARED_UI_DEPENDENCIES = [
+  "d3-contour",
+  "d3-geo",
+  "d3-geo-projection",
+  "html2canvas",
+  "jspdf",
+  "react",
+  "react-dom",
+  "topojson-client",
+  "world-atlas",
+];
+
 const { d1, r2 } = hostingConfig;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
@@ -44,6 +59,7 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    resolve: { dedupe: SHARED_UI_DEPENDENCIES },
     server: {
       host: "127.0.0.1",
       fs: { allow: [".."] },
