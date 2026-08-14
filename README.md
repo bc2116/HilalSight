@@ -6,8 +6,6 @@ HilalSight estimates where the new crescent moon (*hilal*) may be visible using 
 - Moon prior to conjunction (new moon)
 - No sunset or no moonset during the requested civil day
 
-Try the hosted app: [hilalsight.longhorizon.chatgpt.site](https://hilalsight.longhorizon.chatgpt.site/)
-
 > [!IMPORTANT]
 > HilalSight is an astronomical planning and educational tool. It does not make an official religious determination. Actual sighting depends on weather, atmospheric transparency, observer experience, optics, and the rules of the relevant local authority.
 
@@ -83,7 +81,7 @@ npm ci
 npm run dev -- --hostname 127.0.0.1
 ```
 
-The hosted adapter intentionally disables cache warming and limits public maps to 2° and 5° grids.
+The hosted adapter intentionally disables cache warming and limits public maps to 2° and 5° grids. Publishing this repository does not deploy the Sites adapter; deployment is a separate release step whose live source/license footer and API behavior must be verified afterward.
 
 ## Validation
 

@@ -1,6 +1,6 @@
 # HilalSight Sites Adapter
 
-This directory packages HilalSight for the public hosted app at [hilalsight.longhorizon.chatgpt.site](https://hilalsight.longhorizon.chatgpt.site/) without replacing the local FastAPI implementation.
+This directory packages HilalSight for a separate Sites deployment without replacing the local FastAPI implementation. Publishing the GitHub repository does not deploy this adapter; verify the live source/license footer and API behavior after every deployment.
 
 ## Runtime Boundary
 

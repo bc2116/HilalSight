@@ -4,7 +4,7 @@
 
 - Public repository: `bc2116/HilalSight`
 - Product: HilalSight crescent-visibility planner
-- Hosted app: `https://hilalsight.longhorizon.chatgpt.site/`
+- Sites deployment target: `https://hilalsight.longhorizon.chatgpt.site/` (deployed separately from GitHub)
 
 ## Shared Operating Layer
 
