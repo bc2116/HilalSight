@@ -1,5 +1,7 @@
 # HilalSight
 
+[**Try the live application**](https://hilalsight.longhorizon.chatgpt.site/)
+
 HilalSight estimates where the new crescent moon (*hilal*) may be visible using the HMNAO/Yallop (1997) q-test and renders global visibility maps with overlays for:
 
 - Moon sets before the Sun
